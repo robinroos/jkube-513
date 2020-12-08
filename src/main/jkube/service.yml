@@ -1,0 +1,10 @@
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+    - name: hazelcast
+      protocol: TCP
+      port: 5701
+      targetPort: 5701

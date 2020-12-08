@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2019 Red Hat, Inc.
+    This program and the accompanying materials are made
+    available under the terms of the Eclipse Public License 2.0
+    which is available at:
+
+        https://www.eclipse.org/legal/epl-2.0/
+
+    SPDX-License-Identifier: EPL-2.0
+
+    Contributors:
+      Red Hat, Inc. - initial API and implementation
+
+-->
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.4.0</version>
+  </parent>
+
+  <groupId>org.eclipse.jkube.quickstarts.maven</groupId>
+  <artifactId>spring-boot</artifactId>
+  <version>1.0.1</version>
+  <name>Eclipse JKube :: Quickstarts :: Maven :: Spring Boot Web</name>
+  <packaging>jar</packaging>
+
+  <description>
+    Spring Boot Web application with a single @RestController.
+    Shows how to deploy Spring Boot applications to Kubernetes (-Pkubermetes) and OpenShift (-Popenshift) using Eclipse JKube.
+  </description>
+
+  <properties>
+    <jkube.version>1.0.2</jkube.version>
+  </properties>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Nexus Release Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+  <dependencies>
+
+    <!-- Boot generator  -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jolokia</groupId>
+      <artifactId>jolokia-core</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>rr</id>
+      <properties>
+        <jkube.namespace>cacheui</jkube.namespace>
+        <jkube.masterUrl>REDACTED</jkube.masterUrl>
+        <jkube.apiVersion>v1</jkube.apiVersion>
+
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <kubernetes.trust.certificates>true</kubernetes.trust.certificates>
+        <jkube.enricher.jkube-service.type>ClusterIP</jkube.enricher.jkube-service.type>
+        <jkube.enricher.jkube-service.normalizePort>true</jkube.enricher.jkube-service.normalizePort>
+        <jkube.generator.alias>${project.artifactId}</jkube.generator.alias>
+      </properties>
+    </profile>
+    <profile>
+      <id>openshift</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.jkube</groupId>
+            <artifactId>openshift-maven-plugin</artifactId>
+            <version>${jkube.version}</version>
+
+            <configuration>
+              <resources>
+                <labels>
+                  <all>
+<!--                    <testProject>spring-boot-sample</testProject>-->
+                  </all>
+                </labels>
+              </resources>
+
+              <generator>
+                <includes>
+                  <include>spring-boot</include>
+                </includes>
+                <config>
+                  <spring-boot>
+                    <color>never</color>
+                  </spring-boot>
+                </config>
+              </generator>
+              <enricher>
+                <excludes>
+                  <exclude>jkube-expose</exclude>
+                </excludes>
+                <config>
+                  <jkube-service>
+                    <type>ClusterIP</type>
+                  </jkube-service>
+                </config>
+              </enricher>
+            </configuration>
+
+            <executions>
+              <execution>
+                <goals>
+                  <goal>resource</goal>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>

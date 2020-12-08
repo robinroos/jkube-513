@@ -1,0 +1,13 @@
+---
+apiVersion: project.openshift.io/v1
+kind: Project
+metadata:
+  labels:
+    app: spring-boot
+    provider: jkube
+    version: 1.0.1
+    group: org.eclipse.jkube.quickstarts.maven
+  name: cacheui
+  namespace: cacheui
+status:
+  phase: Active
